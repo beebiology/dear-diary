@@ -114,7 +114,7 @@ submitButton.addEventListener("click", async () => {
             throw new Error(insertError.message);
         }
 
-        journalEntry.value = "Your journal entry was saved!";
+        journalEntry.value = "Your journal entry was saved.";
 
         // Retrieve the current authentication token
         const { data: sessionData, error: sessionError } =
