@@ -170,8 +170,12 @@ class handler(BaseHTTPRequestHandler):
                 {"error": "Invalid request data"}
             )
 
-        except Exception:
+        except Exception as error:
+            print(
+        f"Backend error: {type(error).__name__}: {error}",
+        flush=True
+    )
             self.send_json(
-                500,
-                {"error": "Unable to generate a response"}
-            )
+        500,
+        {"error": "Unable to generate a response"}
+    )
