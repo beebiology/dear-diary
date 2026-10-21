@@ -94,13 +94,13 @@ submitButton.addEventListener("click", async () => {
     answer.textContent = "";
 
     try {
-        // // Get the authenticated user
-        // const { data, error: userError } =
-        //     await supabaseClient.auth.getUser();
+        // Get the authenticated user
+        const { data, error: userError } =
+            await supabaseClient.auth.getUser();
 
-        // if (userError || !data.user) {
-        //     throw new Error("Please sign in again.");
-        // }
+        if (userError || !data.user) {
+            throw new Error("Please sign in again.");
+        }
 
         // Save the journal entry
         const { error: insertError } = await supabaseClient
