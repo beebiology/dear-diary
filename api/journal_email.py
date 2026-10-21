@@ -23,15 +23,36 @@ def send_journal_email(entry_id):
     # Retrieve the original entry from Supabase (CODE ADDED: THE LINE JUST UNDER THIS)
     print("Step 1: Retrieving journal entry", flush=True) 
 
-    result = (
-        supabase.table("journal_entries")
-        .select("id, user_id, entry_text, entry_date")
-        .eq("id", entry_id)
-        .single()
-        .execute()
-    )
+    
+print("Step 1: Retrieving journal entry", flush=True)
 
-    entry = result.data
+request = Request(
+    f"{os.environ['SUPABASE_URL'].rstrip('/')}/rest/v1/journal_entries",
+    headers={
+        "apikey": os.environ["SUPABASE_SECRET_KEY"],
+        "Authorization": f"Bearer {os.environ['SUPABASE_SECRET_KEY']}",
+        "Accept": "application/json"
+    }
+)
+
+# Add the entry ID as a query parameter
+from urllib.parse import urlencode
+
+request.full_url += "?" + urlencode({
+    "id": f"eq.{entry_id}",
+    "select": "id,user_id,entry_text,entry_date"
+})
+
+with urlopen(request, timeout=10) as response:
+    records = json.load(response)
+
+if len(records) != 1:
+    raise ValueError("Journal entry not found")
+
+entry = records[0]
+
+print("Step 1 complete: Journal entry retrieved", flush=True)
+
 
     # Look up the owner's email address (CODE ADDED)
     print("Step 2: Retrieving user email", flush=True)
@@ -69,7 +90,7 @@ def send_journal_email(entry_id):
     )
 
     print("Step 3: Sending email through Resend", flush=True)
-    
+
     with urlopen(request, timeout=15) as response:
         return json.load(response)
 
