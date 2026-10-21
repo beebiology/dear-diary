@@ -145,7 +145,11 @@ class handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.end_headers()
 
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError, TypeError) as error:
+            print(
+        f"Webhook data error: {type(error).__name__}: {error}",
+        flush=True
+    )
             self.send_response(400)
             self.end_headers()
 
