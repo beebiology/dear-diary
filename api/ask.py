@@ -60,7 +60,7 @@ def generate_response(entry):
         store=False
     )
 
-    return response.output_text
+    return response.output_text 
 
 
 class handler(BaseHTTPRequestHandler):
