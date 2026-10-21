@@ -7,6 +7,8 @@ from http.server import BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 
+from urllib.error import HTTPError
+
 from supabase import create_client
 
 
@@ -90,9 +92,22 @@ def send_journal_email(entry_id):
     )
 
     print("Step 3: Sending email through Resend", flush=True)
-    
-    with urlopen(request, timeout=15) as response:
-        return json.load(response)
+
+
+    try:
+        with urlopen(request, timeout=15) as response:
+            return json.load(response)
+
+    except HTTPError as error:
+        error_body = error.read().decode("utf-8")
+
+        print(
+            f"Resend HTTP {error.code}: {error_body}",
+            flush=True
+        )
+
+        raise
+
 
 
 class handler(BaseHTTPRequestHandler):
