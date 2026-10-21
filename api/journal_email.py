@@ -15,12 +15,14 @@ EMAIL_FROM = os.environ["EMAIL_FROM"]
 
 supabase = create_client(
     os.environ["SUPABASE_URL"],
-    os.environ["SUPABASE_SECRET_KEY"]
+    os.environ["SUPABASE_SECRET_KEY"]   
 )
 
 
 def send_journal_email(entry_id):
-    # Retrieve the original entry from Supabase
+    # Retrieve the original entry from Supabase (CODE ADDED: THE LINE JUST UNDER THIS)
+    print("Step 1: Retrieving journal entry", flush=True) 
+
     result = (
         supabase.table("journal_entries")
         .select("id, user_id, entry_text, entry_date")
@@ -31,7 +33,9 @@ def send_journal_email(entry_id):
 
     entry = result.data
 
-    # Look up the owner's email address
+    # Look up the owner's email address (CODE ADDED)
+    print("Step 2: Retrieving user email", flush=True)
+
     user_result = supabase.auth.admin.get_user_by_id(
         entry["user_id"]
     )
@@ -64,6 +68,8 @@ def send_journal_email(entry_id):
         method="POST"
     )
 
+    print("Step 3: Sending email through Resend", flush=True)
+    
     with urlopen(request, timeout=15) as response:
         return json.load(response)
 
