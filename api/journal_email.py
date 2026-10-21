@@ -5,6 +5,7 @@ import hmac
 
 from http.server import BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
+from urllib.parse import urlencode
 
 from supabase import create_client
 
@@ -18,41 +19,40 @@ supabase = create_client(
     os.environ["SUPABASE_SECRET_KEY"]   
 )
 
-
 def send_journal_email(entry_id):
-    # Retrieve the original entry from Supabase (CODE ADDED: THE LINE JUST UNDER THIS)
-    print("Step 1: Retrieving journal entry", flush=True) 
 
-    
-print("Step 1: Retrieving journal entry", flush=True)
+    print("Step 1: Retrieving journal entry", flush=True)
 
-request = Request(
-    f"{os.environ['SUPABASE_URL'].rstrip('/')}/rest/v1/journal_entries",
-    headers={
-        "apikey": os.environ["SUPABASE_SECRET_KEY"],
-        "Authorization": f"Bearer {os.environ['SUPABASE_SECRET_KEY']}",
-        "Accept": "application/json"
-    }
-)
+    params = urlencode({
+        "id": f"eq.{entry_id}",
+        "select": "id,user_id,entry_text,entry_date"
+    })
 
-# Add the entry ID as a query parameter
-from urllib.parse import urlencode
+    url = (
+        f"{os.environ['SUPABASE_URL'].rstrip('/')}"
+        f"/rest/v1/journal_entries?{params}"
+    )
 
-request.full_url += "?" + urlencode({
-    "id": f"eq.{entry_id}",
-    "select": "id,user_id,entry_text,entry_date"
-})
+    request = Request(
+        url,
+        headers={
+    "apikey": os.environ["SUPABASE_SECRET_KEY"],
+    "Accept": "application/json"
+}
+    )
 
-with urlopen(request, timeout=10) as response:
-    records = json.load(response)
+    with urlopen(request, timeout=10) as response:
+        records = json.load(response)
 
-if len(records) != 1:
-    raise ValueError("Journal entry not found")
+    if len(records) != 1:
+        raise ValueError("Journal entry not found")
 
-entry = records[0]
+    entry = records[0]
 
-print("Step 1 complete: Journal entry retrieved", flush=True)
-
+    print(
+        "Step 1 complete: Journal entry retrieved",
+        flush=True
+    )
 
     # Look up the owner's email address (CODE ADDED)
     print("Step 2: Retrieving user email", flush=True)
@@ -90,7 +90,7 @@ print("Step 1 complete: Journal entry retrieved", flush=True)
     )
 
     print("Step 3: Sending email through Resend", flush=True)
-
+    
     with urlopen(request, timeout=15) as response:
         return json.load(response)
 
