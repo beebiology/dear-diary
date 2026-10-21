@@ -87,6 +87,7 @@ def send_journal_email(entry_id):
             "Authorization": f"Bearer {RESEND_API_KEY}",
             "Content-Type": "application/json",
             "Idempotency-Key": f"journal-entry-{entry_id}"
+            "User-Agent": "DearDiary/1.0"
         },
         method="POST"
     )
