@@ -4,9 +4,68 @@ import os
 import hmac
 
 from http.server import BaseHTTPRequestHandler
+from urllib.request import Request, urlopen
+
+from supabase import create_client
 
 
 WEBHOOK_SECRET = os.environ["JOURNAL_WEBHOOK_SECRET"]
+RESEND_API_KEY = os.environ["RESEND_API_KEY"]
+EMAIL_FROM = os.environ["EMAIL_FROM"]
+
+supabase = create_client(
+    os.environ["SUPABASE_URL"],
+    os.environ["SUPABASE_SECRET_KEY"]
+)
+
+
+def send_journal_email(entry_id):
+    # Retrieve the original entry from Supabase
+    result = (
+        supabase.table("journal_entries")
+        .select("id, user_id, entry_text, entry_date")
+        .eq("id", entry_id)
+        .single()
+        .execute()
+    )
+
+    entry = result.data
+
+    # Look up the owner's email address
+    user_result = supabase.auth.admin.get_user_by_id(
+        entry["user_id"]
+    )
+
+    email = user_result.user.email
+
+    if not email:
+        raise ValueError("Journal owner has no email")
+
+    # Prepare the outgoing email
+    email_data = {
+        "from": EMAIL_FROM,
+        "to": [email],
+        "subject": f"Your Dear Diary entry - {entry['entry_date']}",
+        "text": (
+            f"Your journal entry from {entry['entry_date']}:\n\n"
+            f"{entry['entry_text']}"
+        )
+    }
+
+    # Send the email using Resend
+    request = Request(
+        "https://api.resend.com/emails",
+        data=json.dumps(email_data).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {RESEND_API_KEY}",
+            "Content-Type": "application/json",
+            "Idempotency-Key": f"journal-entry-{entry_id}"
+        },
+        method="POST"
+    )
+
+    with urlopen(request, timeout=15) as response:
+        return json.load(response)
 
 
 class handler(BaseHTTPRequestHandler):
@@ -23,16 +82,16 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
-        content_length = int(
-            self.headers.get("Content-Length", "0")
-        )
-
-        if content_length <= 0 or content_length > 20000:
-            self.send_response(400)
-            self.end_headers()
-            return
-
         try:
+            content_length = int(
+                self.headers.get("Content-Length", "0")
+            )
+
+            if content_length <= 0 or content_length > 20000:
+                self.send_response(400)
+                self.end_headers()
+                return
+
             body = json.loads(
                 self.rfile.read(content_length)
             )
@@ -46,18 +105,29 @@ class handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 return
 
-            record = body["record"]
-            entry_id = record["id"]
+            entry_id = body["record"]["id"]
+
+            result = send_journal_email(entry_id)
 
             print(
-                f"Journal webhook received for entry {entry_id}",
+                f"Email accepted for entry {entry_id}: "
+                f"{result.get('id')}",
                 flush=True
             )
 
             self.send_response(200)
             self.end_headers()
-            self.wfile.write(b"Webhook received")
 
         except (ValueError, KeyError, TypeError):
             self.send_response(400)
+            self.end_headers()
+
+        except Exception as error:
+            print(
+                f"Email webhook error: "
+                f"{type(error).__name__}: {error}",
+                flush=True
+            )
+
+            self.send_response(500)
             self.end_headers()
