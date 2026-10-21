@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dear Diary</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="journalSection" hidden>
+        <h1>Dear Diary</h1>
+
+        <p id="date"></p>
+
+        <h2>Tell me a little about your day.</h2>
+
+        <textarea
+            id="journalEntry"
+            placeholder="..."
+        ></textarea>
+
+        <br>
+
+        <button id="submitButton">Submit</button>
+
+        <p id="message"></p>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabaseClient.js"></script>
+
+    <script>
+        const dateElement = document.getElementById("date");
+        const journalEntry = document.getElementById("journalEntry");
+        const submitButton = document.getElementById("submitButton");
+        const message = document.getElementById("message");
+
+        const today = new Date();
+
+        dateElement.textContent = today.toLocaleDateString();
+
+        async function checkLogin() {
+    const { data, error } = await supabaseClient.auth.getUser();
+
+    if (error || !data.user) {
+        window.location.href = "login.html";
+    } else {
+        document.getElementById("journalSection").hidden = false;
+    }
+}
+checkLogin();
+
+        
+submitButton.addEventListener("click", async () => {
+    const entry = journalEntry.value.trim();
+
+    if (entry === "") {
+        message.textContent = "Please write something first.";
+        return;
+    }
+
+    // Find the currently authenticated user
+    const { data, error: userError } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !data.user) {
+        message.textContent = "Please sign in again.";
+        return;
+    }
+
+    // Save the journal entry to Supabase
+    const { error } = await supabaseClient
+        .from("journal_entries")
+        .insert({
+            user_id: data.user.id,
+            entry_text: entry
+        });
+
+    if (error) {
+        message.textContent = "Error: " + error.message;
+    } else {
+        message.textContent = "Your journal entry was saved!";
+        journalEntry.value = entry;
+    }
+});
+
+    </script>
+
+</body>
+</html>

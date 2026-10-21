@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal Login</title>
+</head>
+
+<body>
+    <h1>Dear Diary</h1>
+
+    <div id="loginSection" hidden>
+        <h2>Sign in</h2>
+        <input type="email" id="email" placeholder="Your email address">
+        <button id="loginButton">Send Login Link</button>
+    </div>
+
+    <p id="message"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabaseClient.js"></script>
+
+    <script>
+        const emailInput = document.getElementById("email");
+        const loginButton = document.getElementById("loginButton");
+        const message = document.getElementById("message");
+        const loginSection = document.getElementById("loginSection");
+
+        loginButton.addEventListener("click", async () => {
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                message.textContent = "Please enter your email.";
+                return;
+            }
+
+            const { error } = await supabaseClient.auth.signInWithOtp({
+                email: email,
+                options: {
+                    emailRedirectTo: window.location.href.split("#")[0]
+                }
+            });
+
+            message.textContent = error
+                ? error.message
+                : "Check your email for a login link.";
+        });
+
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                window.location.href = "index.html";
+            } else {
+                loginSection.hidden = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
