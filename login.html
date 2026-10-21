@@ -48,13 +48,24 @@
                 : "Check your email for a login link.";
         });
 
-        supabaseClient.auth.onAuthStateChange((event, session) => {
-            if (session?.user) {
-                window.location.href = "index.html";
-            } else {
-                loginSection.hidden = false;
-            }
-        });
+        async function checkLogin() {
+    const { data, error } = await supabaseClient.auth.getUser();
+
+    if (!error && data.user) {
+        window.location.replace("index.html");
+    } else {
+        loginSection.hidden = false;
+    }
+}
+
+checkLogin();
+
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" && session?.user) {
+        window.location.replace("index.html");
+    }
+});
+
     </script>
 </body>
 
