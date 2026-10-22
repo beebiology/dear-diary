@@ -55,6 +55,17 @@
         <div id="answer"></div>
     </div>
 
+    <!-- HISTORY SECTION -->
+
+<section id="historySection">
+    <h2>Previous Entries</h2>
+
+    <input type="date" id="historyDate">
+
+    <div id="historyEntries"></div>
+</section>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabaseClient.js"></script>
 
@@ -166,6 +177,8 @@ submitButton.addEventListener("click", async () => {
 
 // THIS IS FOR THE CALENDAR
 
+let journalEntries = [];
+
 async function getJournalEntries() {
     const { data, error } = await supabaseClient
         .from("journal_entries")
@@ -177,8 +190,35 @@ async function getJournalEntries() {
         return;
     }
 
-    console.log(data);
+    journalEntries = data;
 }
+
+function showEntries(date) {
+    const container = document.getElementById("historyEntries");
+
+    container.replaceChildren();
+
+    const matchingEntries = journalEntries.filter(
+        entry => entry.entry_date === date
+    );
+
+    if (matchingEntries.length === 0) {
+        container.textContent = "No journal entries for this date.";
+        return;
+    }
+
+    matchingEntries.forEach(entry => {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = entry.entry_text;
+        container.appendChild(paragraph);
+    });
+}
+
+const historyDate = document.getElementById("historyDate");
+
+historyDate.addEventListener("change", () => {
+    showEntries(historyDate.value);
+});
 
 
     </script>
