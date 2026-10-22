@@ -48,7 +48,7 @@
                 : "Check your email for a login link.";
         });
 
-        async function checkLogin() {
+    async function checkLogin() {
     const { data, error } = await supabaseClient.auth.getUser();
 
     if (!error && data.user) {

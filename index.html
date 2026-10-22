@@ -160,7 +160,25 @@ submitButton.addEventListener("click", async () => {
     } finally {
         submitButton.disabled = false;
     }
+
+    await getJournalEntries();
 });
+
+// THIS IS FOR THE CALENDAR
+
+async function getJournalEntries() {
+    const { data, error } = await supabaseClient
+        .from("journal_entries")
+        .select("id, entry_date, entry_text")
+        .order("entry_date", { ascending: false });
+
+    if (error) {
+        console.error("Unable to retrieve journal entries:", error);
+        return;
+    }
+
+    console.log(data);
+}
 
 
     </script>
