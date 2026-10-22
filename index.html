@@ -172,6 +172,12 @@ submitButton.addEventListener("click", async () => {
 
         journalEntry.value = "Your journal entry was saved.";
 
+        await getJournalEntries();
+
+        if (selectedDate) {
+            showEntries(selectedDate);
+        }
+
         // Retrieve the current authentication token
         const { data: sessionData, error: sessionError } =
             await supabaseClient.auth.getSession();
@@ -233,8 +239,10 @@ async function getJournalEntries() {
         console.error("Unable to retrieve journal entries:", error);
         return;
     }
+    
 
     journalEntries = data;
+        renderCalendar();
 }
 
 function showEntries(date) {
