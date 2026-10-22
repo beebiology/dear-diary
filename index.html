@@ -92,6 +92,8 @@
 }
 checkLogin();
 
+await getJournalEntries();
+
         
 submitButton.addEventListener("click", async () => {
     const entry = journalEntry.value.trim();
@@ -172,7 +174,6 @@ submitButton.addEventListener("click", async () => {
         submitButton.disabled = false;
     }
 
-    await getJournalEntries();
 });
 
 // THIS IS FOR THE CALENDAR
