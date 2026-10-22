@@ -31,6 +31,44 @@
         #message {
             margin-top: 20px;
         }
+
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+#calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin: 20px 0;
+}
+
+#calendarGrid button {
+    padding: 12px 4px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+}
+
+#calendarGrid button.has-entry {
+    background: #dcebdc;
+    font-weight: bold;
+}
+
+#calendarGrid button.selected {
+    border: 2px solid #357a38;
+}
+
+#calendarGrid .weekday {
+    text-align: center;
+    font-weight: bold;
+}
+
     </style>
 </head>
 
@@ -60,8 +98,13 @@
 <section id="historySection">
     <h2>Previous Entries</h2>
 
-    <input type="date" id="historyDate">
+    <div class="calendar-navigation">
+        <button type="button" id="previousMonth">←</button>
+        <h3 id="calendarMonth"></h3>
+        <button type="button" id="nextMonth">→</button>
+    </div>
 
+    <div id="calendarGrid"></div>
     <div id="historyEntries"></div>
 </section>
 
@@ -215,11 +258,83 @@ function showEntries(date) {
     });
 }
 
-const historyDate = document.getElementById("historyDate");
+// JAVASCRIPT FOR THE CALENDAR
 
-historyDate.addEventListener("change", () => {
-    showEntries(historyDate.value);
+
+let calendarDate = new Date();
+let selectedDate = null;
+
+const calendarMonth = document.getElementById("calendarMonth");
+const calendarGrid = document.getElementById("calendarGrid");
+
+function renderCalendar() {
+    calendarGrid.replaceChildren();
+
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+
+    calendarMonth.textContent = calendarDate.toLocaleDateString(
+        "en-US",
+        { month: "long", year: "numeric" }
+    );
+
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    weekdays.forEach(day => {
+        const label = document.createElement("div");
+        label.className = "weekday";
+        label.textContent = day;
+        calendarGrid.appendChild(label);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        calendarGrid.appendChild(document.createElement("div"));
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = [
+            year,
+            String(month + 1).padStart(2, "0"),
+            String(day).padStart(2, "0")
+        ].join("-");
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = day;
+
+        if (journalEntries.some(entry => entry.entry_date === date)) {
+            button.classList.add("has-entry");
+        }
+
+        if (date === selectedDate) {
+            button.classList.add("selected");
+        }
+
+        button.addEventListener("click", () => {
+            selectedDate = date;
+            showEntries(date);
+            renderCalendar();
+        });
+
+        calendarGrid.appendChild(button);
+    }
+}
+
+document.getElementById("previousMonth").addEventListener("click", () => {
+    calendarDate.setDate(1);
+    calendarDate.setMonth(calendarDate.getMonth() - 1);
+    renderCalendar();
 });
+
+document.getElementById("nextMonth").addEventListener("click", () => {
+    calendarDate.setDate(1);
+    calendarDate.setMonth(calendarDate.getMonth() + 1);
+    renderCalendar();
+});
+
 
 
     </script>
