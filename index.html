@@ -40,12 +40,12 @@
 #calendarGrid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    gap: 4px;
     margin: 20px 0;
 }
 
 #calendarGrid button {
-    padding: 12px 4px;
+    padding: 6px 3px;
     border: 1px solid #ddd;
     border-radius: 6px;
     background: white;
@@ -84,15 +84,26 @@ body {
     gap: 30px;
 }
 
-.entry-panel,
-.calendar-panel {
-    flex: 1;
+.entry-panel {
+    flex: 2;
     min-width: 0;
+    padding-left: 50px;
+}
+
+.calendar-panel  {
+    flex: 1;
+    padding-right: 50px;
+    padding-top: 10px;
+}
+
+.calendar-panel h2 {
+    font-size: 22px;
+
 }
 
 .entry-panel textarea {
-    width: 100%;
-    height: 360px;
+    width: 90%;
+    height: 200px;
     box-sizing: border-box;
 }
 
@@ -100,6 +111,11 @@ body {
     .diary-layout {
         flex-direction: column;
     }
+    .calendar-panel  {
+    flex: 1;
+    padding-right: 0px;
+    padding-top: 10px;
+}
 }
 
     </style>
@@ -167,11 +183,11 @@ body {
         async function checkLogin() {
     const { data, error } = await supabaseClient.auth.getUser();
 
-    if (error || !data.user) {
-        window.location.href = "login.html";
-    } else {
-        document.getElementById("journalSection").hidden = false;
-    }
+    // if (error || !data.user) {
+    //     window.location.href = "login.html";
+    // } else {
+    //     document.getElementById("journalSection").hidden = false;
+    // }
 
     await getJournalEntries();
 }
