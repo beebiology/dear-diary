@@ -71,10 +71,6 @@ body {
     padding: 30px 2%;
 }
 
-[hidden] {
-    display: none !important;
-}
-
 #journalSection {
     width: 100%;
     max-width: none;
@@ -139,48 +135,49 @@ body {
 
 <body>
 
-<div class="diary-layout">
-        
-    <div class="entry-panel">
-        <div id="journalSection" hidden>
-        <h1>dear diary</h1>
+<section id="journalSection" hidden>
 
-        <p id="date"></p>
+    <div class="diary-layout">
 
-        <h2>Tell me a little about your day.</h2>
+        <div class="entry-panel">
+            <h1>dear diary</h1>
 
-        <textarea
-            id="journalEntry"
-            placeholder="..."
-        ></textarea>
+            <p id="date"></p>
 
-        <br>
+            <h2>Tell me a little about your day.</h2>
 
-        <button id="submitButton">Submit</button>
+            <textarea
+                id="journalEntry"
+                placeholder="..."
+            ></textarea>
 
-        <p id="message"></p>
-        <div id="answer"></div>
+            <br>
 
+            <button id="submitButton">Submit</button>
+
+            <p id="message"></p>
+            <div id="answer"></div>
         </div>
+
+        <div class="calendar-panel">
+            <section id="historySection">
+                <h2>Previous Entries</h2>
+
+                <div class="calendar-navigation">
+                    <button type="button" id="previousMonth">←</button>
+                    <h3 id="calendarMonth"></h3>
+                    <button type="button" id="nextMonth">→</button>
+                </div>
+
+                <div id="calendarGrid"></div>
+                <div id="historyEntries"></div>
+            </section>
+        </div>
+
     </div>
 
-    <!-- HISTORY SECTION -->
-<div class="calendar-panel">
-<section id="historySection">
-
-    <h2>Previous Entries</h2>
-
-    <div class="calendar-navigation">
-        <button type="button" id="previousMonth">←</button>
-        <h3 id="calendarMonth"></h3>
-        <button type="button" id="nextMonth">→</button>
-    </div>
-
-    <div id="calendarGrid"></div>
-    <div id="historyEntries"></div>
-    </div>
-</div>
 </section>
+
 
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
