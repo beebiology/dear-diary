@@ -325,11 +325,11 @@ function showEntries(date) {
         return;
     }
 
-    matchingEntries.forEach(entry => {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = entry.entry_text;
-        container.appendChild(paragraph);
-    });
+    matchingEntries.forEach((entry, index) => {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = `${index + 1}. ${entry.entry_text}`;
+    container.appendChild(paragraph);
+});
 }
 
 // JAVASCRIPT FOR THE CALENDAR

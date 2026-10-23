@@ -3,6 +3,9 @@ import json
 import os
 import hmac
 
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 from http.server import BaseHTTPRequestHandler
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode
@@ -22,7 +25,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_SECRET_KEY)
 def send_journal_email(entry_id):
     params = urlencode({
         "id": f"eq.{entry_id}",
-        "select": "id,user_id,entry_text,entry_date"
+        "select": "id,user_id,entry_text,entry_date,created_at"
     })
 
     request = Request(
