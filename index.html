@@ -10,9 +10,6 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 60px auto;
-            padding: 20px;
         }
 
         textarea {
@@ -69,11 +66,51 @@
     font-weight: bold;
 }
 
+
+body {
+    margin: 0;
+    padding: 30px 2%;
+}
+
+#journalSection {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+.diary-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 30px;
+}
+
+.entry-panel,
+.calendar-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+.entry-panel textarea {
+    width: 100%;
+    height: 360px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    .diary-layout {
+        flex-direction: column;
+    }
+}
+
     </style>
 </head>
 
 <body>
-    <div id="journalSection" hidden>
+
+<div class="diary-layout">
+        
+    <div class="entry-panel">
+        <div id="journalSection" hidden></div>
         <h1>Dear Diary</h1>
 
         <p id="date"></p>
@@ -91,11 +128,13 @@
 
         <p id="message"></p>
         <div id="answer"></div>
+        </div>
     </div>
 
     <!-- HISTORY SECTION -->
-
+<div class="calendar-panel">
 <section id="historySection">
+
     <h2>Previous Entries</h2>
 
     <div class="calendar-navigation">
@@ -106,6 +145,8 @@
 
     <div id="calendarGrid"></div>
     <div id="historyEntries"></div>
+    </div>
+</div>
 </section>
 
 
