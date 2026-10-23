@@ -189,11 +189,11 @@ body {
         async function checkLogin() {
     const { data, error } = await supabaseClient.auth.getUser();
 
-    // if (error || !data.user) {
-    //     window.location.href = "login.html";
-    // } else {
-    //     document.getElementById("journalSection").hidden = false;
-    // }
+    if (error || !data.user) {
+        window.location.href = "login.html";
+    } else {
+        document.getElementById("journalSection").hidden = false;
+    }
 
     await getJournalEntries();
 }
