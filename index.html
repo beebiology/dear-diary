@@ -119,6 +119,10 @@ body {
     padding-right: 50px;
 }
 
+[hidden] {
+    display: none !important;
+}
+
 @media (max-width: 700px) {
     .diary-layout {
         flex-direction: column;
@@ -195,18 +199,22 @@ body {
 
         dateElement.textContent = today.toLocaleDateString();
 
-        async function checkLogin() {
+
+async function checkLogin() {
     const { data, error } = await supabaseClient.auth.getUser();
 
     if (error || !data.user) {
-        window.location.href = "login.html";
-    } else {
-        document.getElementById("journalSection").hidden = false;
+        window.location.replace("login.html");
+        return;
     }
+
+    document.getElementById("journalSection").hidden = false;
 
     await getJournalEntries();
 }
+
 checkLogin();
+
 
         
 submitButton.addEventListener("click", async () => {
